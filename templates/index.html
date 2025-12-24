@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Links</title>
+    <style>
+        /* Estilo simples e limpo */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        
+        /* Formulário */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+
+        /* Lista */
+        .lista-header { margin-top: 40px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .card { background: #fafafa; border: 1px solid #eee; padding: 15px; margin-top: 10px; border-radius: 5px; display: flex; flex-direction: column; }
+        .tag { display: inline-block; background: #e2e6ea; color: #495057; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; margin-bottom: 5px; width: fit-content;}
+        .link-curto { font-size: 1.2em; color: #28a745; font-weight: bold; text-decoration: none; }
+        .link-original { color: #6c757d; font-size: 0.9em; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Meu Encurtador</h1>
+
+        <form action="/" method="POST">
+            <div class="form-group">
+                <label>Link Original</label>
+                <input type="url" name="url_original" required placeholder="Cole o link longo aqui...">
+            </div>
+            <div class="form-group">
+                <label>Nome Personalizado (Atalho)</label>
+                <input type="text" name="url_curta" required placeholder="ex: youtube">
+            </div>
+            <div class="form-group">
+                <label>Pasta / Categoria</label>
+                <input type="text" name="categoria" placeholder="ex: Vídeos">
+            </div>
+            <button type="submit">Criar Atalho</button>
+        </form>
+
+        <h3 class="lista-header">Meus Links Salvos</h3>
+        
+        {% for link in links %}
+            <div class="card">
+                <span class="tag">📁 {{ link.categoria }}</span>
+                <div>
+                    <a href="/{{ link.url_curta }}" target="_blank" class="link-curto">
+                        /{{ link.url_curta }}
+                    </a>
+                    <br>
+                    <span class="link-original">{{ link.url_original }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
