@@ -14,6 +14,11 @@
         button { background-color: #3498db; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         button:hover { background-color: #2980b9; }
 
+        /* Estilo da Barra de Pesquisa */
+        .search-box { margin-top: 30px; margin-bottom: 10px; position: relative; }
+        .search-box input { border: 2px solid #3498db; padding-left: 35px; }
+        .search-icon { position: absolute; left: 10px; top: 14px; color: #3498db; }
+
         .card { background: #fff; border-left: 5px solid #3498db; padding: 15px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
         .info { flex-grow: 1; }
         .acoes { display: flex; gap: 10px; }
@@ -35,7 +40,7 @@
             <label>Cole o Link Longo:</label>
             <input type="url" name="url_original" required placeholder="https://...">
             
-            <label>Personalizar (Opcional - deixe vazio para gerar automático):</label>
+            <label>Personalizar (Opcional):</label>
             <input type="text" name="url_curta" placeholder="ex: xY7z9 ou deixe em branco">
             
             <label>Categoria:</label>
@@ -44,38 +49,63 @@
             <button type="submit">Encurtar Link</button>
         </form>
 
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="inputBusca" onkeyup="filtrarLinks()" placeholder="🔍 Pesquisar por nome, categoria ou link...">
+        </div>
+
         <h3>Meus Links</h3>
-        {% for link in links %}
-            <div class="card">
-                <div class="info">
-                    {% if link.categoria %} <span class="tag">{{ link.categoria }}</span> {% endif %}
-                    <br>
-                    <a href="{{ base_url }}{{ link.url_curta }}" target="_blank" class="link-encurtado" id="link-{{ link.id }}">
-                        {{ base_url }}{{ link.url_curta }}
-                    </a>
-                    <small>{{ link.url_original }}</small>
-                </div>
-                
-                <div class="acoes">
-                    <button class="btn-acao btn-copy" onclick="copiarLink('{{ base_url }}{{ link.url_curta }}')">
-                        <i class="fas fa-copy"></i> Copiar
-                    </button>
+        <div id="listaLinks">
+            {% for link in links %}
+                <div class="card">
+                    <div class="info">
+                        {% if link.categoria %} <span class="tag">{{ link.categoria }}</span> {% endif %}
+                        <br>
+                        <a href="{{ base_url }}{{ link.url_curta }}" target="_blank" class="link-encurtado">
+                            {{ base_url }}{{ link.url_curta }}
+                        </a>
+                        <small>{{ link.url_original }}</small>
+                    </div>
                     
-                    <a href="/deletar/{{ link.id }}" class="btn-acao btn-delete" onclick="return confirm('Tem certeza que deseja apagar?')">
-                        <i class="fas fa-trash"></i>
-                    </a>
+                    <div class="acoes">
+                        <button class="btn-acao btn-copy" onclick="copiarLink('{{ base_url }}{{ link.url_curta }}')">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                        <a href="/deletar/{{ link.id }}" class="btn-acao btn-delete" onclick="return confirm('Tem certeza?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 
     <script>
         function copiarLink(texto) {
             navigator.clipboard.writeText(texto).then(function() {
                 alert('Link copiado: ' + texto);
-            }, function(err) {
-                console.error('Erro ao copiar: ', err);
             });
+        }
+
+        // --- NOVA FUNÇÃO DE FILTRO ---
+        function filtrarLinks() {
+            // 1. Pega o que foi digitado
+            var input = document.getElementById('inputBusca');
+            var filtro = input.value.toLowerCase(); // Transforma em minúsculas
+            var lista = document.getElementById('listaLinks');
+            var cards = lista.getElementsByClassName('card');
+
+            // 2. Passa por cada cartão de link
+            for (var i = 0; i < cards.length; i++) {
+                var textoDoCard = cards[i].textContent || cards[i].innerText;
+                
+                // 3. Verifica se o texto do cartão contém o que foi digitado
+                if (textoDoCard.toLowerCase().indexOf(filtro) > -1) {
+                    cards[i].style.display = ""; // Mostra
+                } else {
+                    cards[i].style.display = "none"; // Esconde
+                }
+            }
         }
     </script>
 </body>
