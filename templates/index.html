@@ -3,62 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciador de Links</title>
+    <title>Encurtador Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Estilo simples e limpo */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { color: #333; text-align: center; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #2c3e50; }
         
-        /* Formulário */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        button:hover { background-color: #0056b3; }
+        input, button { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { background-color: #3498db; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #2980b9; }
 
-        /* Lista */
-        .lista-header { margin-top: 40px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .card { background: #fafafa; border: 1px solid #eee; padding: 15px; margin-top: 10px; border-radius: 5px; display: flex; flex-direction: column; }
-        .tag { display: inline-block; background: #e2e6ea; color: #495057; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; margin-bottom: 5px; width: fit-content;}
-        .link-curto { font-size: 1.2em; color: #28a745; font-weight: bold; text-decoration: none; }
-        .link-original { color: #6c757d; font-size: 0.9em; word-break: break-all; }
+        .card { background: #fff; border-left: 5px solid #3498db; padding: 15px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .info { flex-grow: 1; }
+        .acoes { display: flex; gap: 10px; }
+        
+        .btn-acao { padding: 8px 12px; font-size: 0.9em; border-radius: 4px; text-decoration: none; cursor: pointer; border: none; }
+        .btn-copy { background: #e2e6ea; color: #333; }
+        .btn-delete { background: #ffebee; color: #c62828; }
+        
+        .tag { background: #eceff1; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: bold; color: #455a64; }
+        .link-encurtado { font-size: 1.1em; color: #3498db; font-weight: bold; text-decoration: none; }
+        small { color: #888; display: block; margin-top: 5px; word-break: break-all;}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔗 Meu Encurtador</h1>
+        <h1>✂️ Encurtador & Organizador</h1>
 
         <form action="/" method="POST">
-            <div class="form-group">
-                <label>Link Original</label>
-                <input type="url" name="url_original" required placeholder="Cole o link longo aqui...">
-            </div>
-            <div class="form-group">
-                <label>Nome Personalizado (Atalho)</label>
-                <input type="text" name="url_curta" required placeholder="ex: youtube">
-            </div>
-            <div class="form-group">
-                <label>Pasta / Categoria</label>
-                <input type="text" name="categoria" placeholder="ex: Vídeos">
-            </div>
-            <button type="submit">Criar Atalho</button>
+            <label>Cole o Link Longo:</label>
+            <input type="url" name="url_original" required placeholder="https://...">
+            
+            <label>Personalizar (Opcional - deixe vazio para gerar automático):</label>
+            <input type="text" name="url_curta" placeholder="ex: xY7z9 ou deixe em branco">
+            
+            <label>Categoria:</label>
+            <input type="text" name="categoria" placeholder="ex: Trabalho">
+            
+            <button type="submit">Encurtar Link</button>
         </form>
 
-        <h3 class="lista-header">Meus Links Salvos</h3>
-        
+        <h3>Meus Links</h3>
         {% for link in links %}
             <div class="card">
-                <span class="tag">📁 {{ link.categoria }}</span>
-                <div>
-                    <a href="/{{ link.url_curta }}" target="_blank" class="link-curto">
-                        /{{ link.url_curta }}
-                    </a>
+                <div class="info">
+                    {% if link.categoria %} <span class="tag">{{ link.categoria }}</span> {% endif %}
                     <br>
-                    <span class="link-original">{{ link.url_original }}</span>
+                    <a href="{{ base_url }}{{ link.url_curta }}" target="_blank" class="link-encurtado" id="link-{{ link.id }}">
+                        {{ base_url }}{{ link.url_curta }}
+                    </a>
+                    <small>{{ link.url_original }}</small>
+                </div>
+                
+                <div class="acoes">
+                    <button class="btn-acao btn-copy" onclick="copiarLink('{{ base_url }}{{ link.url_curta }}')">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>
+                    
+                    <a href="/deletar/{{ link.id }}" class="btn-acao btn-delete" onclick="return confirm('Tem certeza que deseja apagar?')">
+                        <i class="fas fa-trash"></i>
+                    </a>
                 </div>
             </div>
         {% endfor %}
     </div>
+
+    <script>
+        function copiarLink(texto) {
+            navigator.clipboard.writeText(texto).then(function() {
+                alert('Link copiado: ' + texto);
+            }, function(err) {
+                console.error('Erro ao copiar: ', err);
+            });
+        }
+    </script>
 </body>
 </html>
